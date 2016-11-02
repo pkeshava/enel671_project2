@@ -1,4 +1,4 @@
-function [e,W] = RLS_algorithm(M,u,d,pre,delta)
+function [e,W] = RLS_algorithm(M,u,d,delta,delta_d)
 %% REQUIRES
     
     % u: tap-input vector
@@ -15,7 +15,8 @@ N = length(u);
 u = u(:);
 d = d(:);
 lamda = 1;
-P = pre^-1*eye(M);
+P = delta^-1*eye(M);
+
 for n=M:N
     % Define tap input vector with length of n-M+1 = 11
     u_vec = u(n:-1:n-M+1);
@@ -24,7 +25,7 @@ for n=M:N
     % Update the inverse correlation matrix
     P = lamda^(-1)*(P - Kal*u_vec'*P);
     % Compute a priori error and update weight vector
-    e(n) = d(n-delta)-W'*u_vec;
+    e(n) = d(n-delta_d)-W'*u_vec;
     W = W + Kal*e(n);
 
 end
