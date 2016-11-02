@@ -80,7 +80,7 @@ clc
 
 M = 11;
 delta = 0.01;
-N = 600;
+N = 500;
 h = [0.2194 1.0 0.2194;0.2798 1.0 0.2798;0.3365 1.0 0.3365;0.3887 1.0 0.3887];
 delta_d = (M-1)/2 + (length(h(1,:))-1)/2;
 K = 400;
@@ -88,41 +88,46 @@ e = zeros(1,N);
 Wtap_ave = zeros(M,N-M+1);
 Wtap = zeros(M,N-M+1);
 W = zeros(M,1);
-P = delta^-1*eye(M);
+delta = 0.01;
 
 for k=1:K
     
       a = BPSK(N);
-      d = a'; 
+      d = a; 
       u = filterinput(a,h);
-      u=u(:,2);
-      d=d(:);
+      u = u(:,1);
+      d = d(:);
       e = zeros(1,N);
-      delta = 0.01;
+      
       lamda = 1;
-      N = length(u);
+      P = delta^-1*eye(M);
       
 for n=M:N
+    
     Wtap(:,n-M+1)= W;
     % Define tap input vector with length of n-M+1 = 11
     u_vec = u(n:-1:n-M+1);
     % Compute Kalman gain vector
     Kal = P*u_vec/(lamda + u_vec'*P*u_vec);
-    % Update the inverse correlation matrix
-    P = lamda^(-1)*(P - Kal*u_vec'*P);
     % Compute a priori error and update weight vector
     e(n) = d(n-delta_d)-W'*u_vec;
     W = W + Kal*e(n);
+    % Update the inverse correlation matrix
+    P = lamda^(-1)*(P - Kal*u_vec'*P);
     
 end
-   Wtap_ave = Wtap_ave+Wtap;
+   Wtap_ave = Wtap_ave + Wtap;
 
 end
 Wtap_ave = Wtap_ave/K;
 WW = zeros(M,N);
 WW(:,M:end) = Wtap_ave;
-    figure(3),plot(WW(5,:),'r','LineWidth',2.5),legend('Ch1'),grid on
-    xlabel('Time(n)'),ylabel('Tap-weight coefficient #5'),hold on
+    figure(3)
+    plot(WW(5,:),'r','LineWidth',2.5);
+    legend('Ch1')
+    grid on
+    xlabel('Time(n)')
+    ylabel('Tap-weight coefficient #5')
 
 
 figure(4); stem(W,'color','r','LineWidth',2.5)
