@@ -74,14 +74,22 @@ for M = [9 11 21]
 end
 hold off
 %% Study of the Amplitude Spectra of the Adaptive Filter
+close all
+clear all 
+clc
+
 M = 11;
-N = 500;
+delta = 0.01;
+N = 600;
+h = [0.2194 1.0 0.2194;0.2798 1.0 0.2798;0.3365 1.0 0.3365;0.3887 1.0 0.3887];
+delta_d = (M-1)/2 + (length(h(1,:))-1)/2;
 K = 400;
+e = zeros(1,N);
 Wtap_ave = zeros(M,N-M+1);
 Wtap = zeros(M,N-M+1);
-delta_d = (M-1)/2 + (length(h(1,:))-1)/2;
 W = zeros(M,1);
 P = delta^-1*eye(M);
+
 for k=1:K
     
       a = BPSK(N);
@@ -110,20 +118,19 @@ end
    Wtap_ave = Wtap_ave+Wtap;
 
 end
-Wtap_ave=Wtap_ave/K;
-WW=zeros(M,N);
+Wtap_ave = Wtap_ave/K;
+WW = zeros(M,N);
 WW(:,M:end) = Wtap_ave;
     figure(3),plot(WW(5,:),'r','LineWidth',2.5),legend('Ch1'),grid on
     xlabel('Time(n)'),ylabel('Tap-weight coefficient #5'),hold on
 
 
-figure(4); stem(W,'color','r','LineWidth',2.5),grid on
+figure(4); stem(W,'color','r','LineWidth',2.5)
+grid on
 xlabel('Filter order(M)'),ylabel('Steady state values of tap-weight coefficients')
 
-
 %   Ch = [0.2194 1 0.2194]; % Channel 1
-Ch = [0.2798 1 0.2798]; % Channel 2
-
+Ch = h(2,:); % Channel 2
 W_f = 0;
 H_f = 0;
 freq = linspace(0,1,2000);
