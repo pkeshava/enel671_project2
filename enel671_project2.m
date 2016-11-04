@@ -74,21 +74,20 @@ for M = [9 11 21]
 end
 hold off
 %% Study of the Amplitude Spectra of the Adaptive Filter
-close all
+
 clear all 
 clc
-
-M = 11;
-delta = 0.01;
 N = 500;
+K = 400;
+M = 11;
 h = [0.2194 1.0 0.2194;0.2798 1.0 0.2798;0.3365 1.0 0.3365;0.3887 1.0 0.3887];
 delta_d = (M-1)/2 + (length(h(1,:))-1)/2;
-K = 400;
 e = zeros(1,N);
 Wtap_ave = zeros(M,N-M+1);
 Wtap = zeros(M,N-M+1);
 W = zeros(M,1);
 delta = 0.01;
+
 
 for k=1:K
     
@@ -97,8 +96,7 @@ for k=1:K
       u = filterinput(a,h);
       u = u(:,1);
       d = d(:);
-      e = zeros(1,N);
-      
+      e = zeros(1,N);     
       lamda = 1;
       P = delta^-1*eye(M);
       
@@ -117,46 +115,49 @@ for n=M:N
     
 end
    Wtap_ave = Wtap_ave + Wtap;
-
 end
+
 Wtap_ave = Wtap_ave/K;
 WW = zeros(M,N);
 WW(:,M:end) = Wtap_ave;
-    figure(3)
-    plot(WW(5,:),'r','LineWidth',2.5);
-    legend('Ch1')
-    grid on
-    xlabel('Time(n)')
-    ylabel('Tap-weight coefficient #5')
-
-
-figure(4); stem(W,'color','r','LineWidth',2.5)
+figure(3)
+plot(WW(5,:),'r','LineWidth',2.5);
+legend('Ch1')
 grid on
-xlabel('Filter order(M)'),ylabel('Steady state values of tap-weight coefficients')
+xlabel('Time(n)')
+ylabel('Tap-weight coefficient #5')
 
-%   Ch = [0.2194 1 0.2194]; % Channel 1
-Ch = h(2,:); % Channel 2
+figure(4); 
+stem(W,'color','r','LineWidth',2.5)
+grid on
+xlabel('Filter order(M)')
+ylabel('Steady state values of tap-weight coefficients')
+
+Ch = h(1,:);
 W_f = 0;
 H_f = 0;
 freq = linspace(0,1,2000);
 z = exp(j * 2 * pi * freq); 
 %=================Magnitude spectrum of Adaptive filter W(f)===============
-     for i = 1:M
-        X = W(i)*(z).^(-i); 
-        W_f = X + W_f; 
-     end
+for i = 1:M
+    X = W(i)*(z).^(-i); 
+    W_f = X + W_f; 
+end
    Magnitude_W_f = abs(W_f);
 %==================Magnitude spectrum for Channel H(f)=====================
-    for j = 1:length(h(1,:))
-        Y = Ch(j)*(z).^(-j);
-        H_f = Y + H_f;
-    end
+for j = 1:length(h(1,:))
+    Y = Ch(j)*(z).^(-j);
+    H_f = Y + H_f;
+end
    Magnitude_H_f = abs(H_f);
    Magnitude_Cascade = ( Magnitude_W_f.* Magnitude_H_f);
 %========================Plotings========================================== 
 figure(5), plot( Magnitude_W_f,'LineWidth',2.5) 
 grid on
 hold on
-plot( Magnitude_H_f,'LineWidth',2.5),plot( Magnitude_Cascade,'LineWidth',2.5),legend('Adaptive filter:|W(f)|','Second Channel:|H(f)|','Cascade:|W(f)H(f)|')
-xlabel('Frequency(f)'),ylabel('Magnitude spectrum')
+plot( Magnitude_H_f,'LineWidth',2.5)
+plot( Magnitude_Cascade,'LineWidth',2.5)
+legend('Adaptive filter:|W(f)|','Second Channel:|H(f)|','Cascade:|W(f)H(f)|')
+xlabel('Frequency(f)')
+ylabel('Magnitude spectrum')
 
