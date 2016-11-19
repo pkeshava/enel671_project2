@@ -2,13 +2,7 @@
 % Pouyan Keshavarzian
 % FALL 2016
 % https://github.com/pkeshava/enel671_Project2
-% LMS algorithm
-    % Filter order: M
-    % Machine Precision Inialization: 0.01
-    % vector data length: N
-    % channel delay + adaptive filter delay: delta
-    % number of runs: K
-    
+
 clear all
 close all
 clc
@@ -81,11 +75,11 @@ N = 500;
 K = 400;
 M = 11;
 h = [0.2194 1.0 0.2194;0.2798 1.0 0.2798;0.3365 1.0 0.3365;0.3887 1.0 0.3887];
-delta_d = (M-1)/2 + (length(h(1,:))-1)/2;
+delta_d = 5;
 e = zeros(1,N);
 Wtap_ave = zeros(M,N-M+1);
 Wtap = zeros(M,N-M+1);
-W = zeros(M,1);
+
 delta = 0.01;
 
 
@@ -93,16 +87,18 @@ for k=1:K
     
       a = BPSK(N);
       d = a; 
+      % function below creats channel outputs and also adds white noise
       u = filterinput(a,h);
       u = u(:,1);
       d = d(:);
       e = zeros(1,N);     
       lamda = 1;
       P = delta^-1*eye(M);
+      W = zeros(M,1);
       
 for n=M:N
     
-    Wtap(:,n-M+1)= W;
+    
     % Define tap input vector with length of n-M+1 = 11
     u_vec = u(n:-1:n-M+1);
     % Compute Kalman gain vector
@@ -112,6 +108,7 @@ for n=M:N
     W = W + Kal*e(n);
     % Update the inverse correlation matrix
     P = lamda^(-1)*(P - Kal*u_vec'*P);
+    Wtap(:,n-M+1)= W;
     
 end
    Wtap_ave = Wtap_ave + Wtap;
