@@ -121,11 +121,11 @@ Wtap_ave = Wtap_ave/K;
 WW = zeros(M,N);
 WW(:,M:end) = Wtap_ave;
 figure(3)
-plot(WW(5,:),'r','LineWidth',2.5);
+plot(WW(6,:),'r','LineWidth',2.5);
 legend('Ch1')
 grid on
 xlabel('Time(n)')
-ylabel('Tap-weight coefficient #5')
+ylabel('Tap-weight coefficient #6')
 
 figure(4); 
 stem(W,'color','r','LineWidth',2.5)
@@ -157,7 +157,7 @@ grid on
 hold on
 plot( Magnitude_H_f,'LineWidth',2.5)
 plot( Magnitude_Cascade,'LineWidth',2.5)
-legend('Adaptive filter:|W(f)|','Second Channel:|H(f)|','Cascade:|W(f)H(f)|')
+legend('Adaptive filter:|W(f)|','First Channel Response:|H(f)|','Equalization:|H(f)W(f)|')
 xlabel('Frequency(f)')
 ylabel('Magnitude spectrum')
 
