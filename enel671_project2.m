@@ -121,14 +121,14 @@ Wtap_ave = Wtap_ave/K;
 WW = zeros(M,N);
 WW(:,M:end) = Wtap_ave;
 figure(3)
-plot(WW(6,:),'r','LineWidth',2.5);
+plot(WW(6,:),'b','LineWidth',2.5);
 legend('Ch1')
 grid on
 xlabel('Time(n)')
 ylabel('Tap-weight coefficient #6')
 
 figure(4); 
-stem(W,'color','r','LineWidth',2.5)
+stem(W,'color','b','LineWidth',2)
 grid on
 xlabel('Filter order(M)')
 ylabel('Steady state values of tap-weight coefficients')
@@ -138,13 +138,13 @@ W_f = 0;
 H_f = 0;
 freq = linspace(0,1,2000);
 z = exp(j * 2 * pi * freq); 
-%=================Magnitude spectrum of Adaptive filter W(f)===============
+%Magnitude spectrum of Adaptive filter W(f)
 for i = 1:M
     X = W(i)*(z).^(-i); 
     W_f = X + W_f; 
 end
    Magnitude_W_f = abs(W_f);
-%==================Magnitude spectrum for Channel H(f)=====================
+%Magnitude spectrum for Channel H(f)
 for j = 1:length(h(1,:))
     Y = Ch(j)*(z).^(-j);
     H_f = Y + H_f;
@@ -160,4 +160,41 @@ plot( Magnitude_Cascade,'LineWidth',2.5)
 legend('Adaptive filter:|W(f)|','First Channel Response:|H(f)|','Equalization:|H(f)W(f)|')
 xlabel('Frequency(f)')
 ylabel('Magnitude spectrum')
+%%
+clear all
+close all
+clc
+
+M = 11;
+delta_d = 6;
+delta = 0.01;
+h = [0.2194 1.0 0.2194;0.2798 1.0 0.2798;0.3365 1.0 0.3365;0.3887 1.0 0.3887];
+mu = 0.075;
+N = 500;
+K = 500;
+
+for k=1:K
+    a = BPSK(N);
+    u = zeros(size(a,2),4);
+    for i = 1:4
+        x= filter(h(i,:),1,a);
+        u(:,i) = awgn(x,10);
+    end
+        [eR,WR] = RLS_algorithm(M,u(:,1),a,delta,delta_d);
+        [eL,WL] = LMS_algorithm(u(:,1),a,mu,delta_d,M);
+        edR(:,k) = eR.^2;
+        edL(:,k) = eL.^2;
+        MSEER = sum(edR,2)/K;
+        MSEEL = sum(edL,2)/K;
+end
+figure(6)
+semilogy(1:N,MSEER,'LineWidth',2)
+hold on
+semilogy(1:N,MSEEL,'LineWidth',2)
+legend('RLS, SNR = 10dB','LMS, SNR = 10dB')
+grid on
+xlabel('Time (s)');
+ylabel('Mean Squared Error');
+title('RLS vs LMS Small SNR');
+
 
